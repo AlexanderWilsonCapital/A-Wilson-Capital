@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function ManagePage() {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false); // Setter is setSubmitted
 
   return (
     <div className="min-h-screen bg-[#050505] text-white p-8 font-sans">
@@ -21,7 +21,8 @@ export default function ManagePage() {
               Regulated advisory and discretionary mandates.
             </p>
 
-            <form onSubmit={(e) => { e.preventDefault(); setMessages(true); }} className="space-y-6">
+            {/* Changed setMessages to setSubmitted below to fix build error */}
+            <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-6">
               <div>
                 <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2">Estimated AUM (Assets Under Management)</label>
                 <select className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-4 text-sm outline-none focus:border-yellow-400 text-white">
@@ -33,7 +34,7 @@ export default function ManagePage() {
 
               <div>
                 <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2">Primary Objective</label>
-                <input type="text" placeholder="e.g. Wealth Preservation / Aggressive Growth" className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-4 text-sm outline-none focus:border-yellow-400 text-white" />
+                <input type="text" placeholder="e.g. Wealth Preservation / Aggressive Growth" className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-4 text-sm outline-none focus:border-yellow-400 text-white" required />
               </div>
 
               <div className="p-6 bg-yellow-400/5 border border-yellow-400/20 rounded-2xl mb-8">
@@ -43,7 +44,7 @@ export default function ManagePage() {
                 </p>
               </div>
 
-              <button className="w-full py-5 bg-yellow-400 text-black font-black rounded-2xl uppercase text-xs hover:bg-yellow-300 transition-all">
+              <button type="submit" className="w-full py-5 bg-yellow-400 text-black font-black rounded-2xl uppercase text-xs hover:bg-yellow-300 transition-all">
                 Request Strategy Consultation
               </button>
             </form>
@@ -53,7 +54,7 @@ export default function ManagePage() {
             <div className="h-2 w-2 bg-yellow-400 rounded-full mx-auto mb-4 animate-ping" />
             <h2 className="text-2xl font-black uppercase italic mb-4">Request Logged</h2>
             <p className="text-zinc-500 text-xs uppercase tracking-widest leading-relaxed">
-              An advisor will review your terminal data and reach out via your registered neural link within 24 hours.
+              An advisor will review your terminal data and reach out via your registered contact details within 24 hours.
             </p>
           </div>
         )}
