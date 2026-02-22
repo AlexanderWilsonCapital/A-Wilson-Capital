@@ -83,7 +83,7 @@ export default function Home() {
           {/* Free Tier */}
           <div className="flex-1 p-10 rounded-3xl border border-white/5 bg-black">
             <h3 className="text-xl font-bold mb-2">Free Analysis</h3>
-            <p className="text-5xl font-black mb-8">£0<span className="text-lg text-gray-600 font-medium">/mo</span></p>
+            <p className="text-5xl font-black mb-8">€0<span className="text-lg text-gray-600 font-medium">/mo</span></p>
             <ul className="space-y-4 text-gray-400 mb-10 text-sm">
               {['Basic portfolio analysis', 'Risk score', 'Diversification feedback', 'AI chat (5 messages/day)', 'Stocks & ETFs coverage'].map((f, i) => (
                 <li key={i} className="flex items-center gap-3"><span className="text-yellow-400/50 italic font-bold text-xs">GO</span> {f}</li>
@@ -92,17 +92,24 @@ export default function Home() {
             <Link href="/analyze" className="block text-center py-4 border border-white/10 rounded-2xl font-bold hover:bg-white/5 transition">Get Started</Link>
           </div>
 
-          {/* Pro Tier */}
+          {/* Pro Tier - STRIPE LINK ADDED HERE */}
           <div className="flex-1 p-10 rounded-3xl border-2 border-yellow-400 bg-yellow-400/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 px-6 py-2 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-bl-2xl">Institutional</div>
             <h3 className="text-xl font-bold mb-2 text-yellow-400">Pro Advisor</h3>
-            <p className="text-5xl font-black mb-8">£29<span className="text-lg text-yellow-400/60 font-medium">/mo</span></p>
+            <p className="text-5xl font-black mb-8">€29<span className="text-lg text-yellow-400/60 font-medium">/mo</span></p>
             <ul className="space-y-4 text-gray-200 mb-10 text-sm">
               {['Deep strategic recommendations', 'Unlimited AI chat', 'All asset classes (Crypto/FX/REITs)', 'Macro analysis', 'Portfolio rebalancing', 'Priority strategy support'].map((f, i) => (
                 <li key={i} className="flex items-center gap-3"><span className="text-yellow-400 italic font-bold text-xs">ADV</span> {f}</li>
               ))}
             </ul>
-            <Link href="/analyze" className="block text-center py-4 bg-yellow-400 text-black rounded-2xl font-black hover:bg-yellow-300 transition-all hover:scale-105">Upgrade to Pro</Link>
+            <a 
+              href="https://buy.stripe.com/5kQ3cw6zzea6gi62jM38401" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center py-4 bg-yellow-400 text-black rounded-2xl font-black hover:bg-yellow-300 transition-all hover:scale-105"
+            >
+              Upgrade to Pro
+            </a>
           </div>
         </div>
       </section>
