@@ -16,6 +16,14 @@ export default function AnalyzePage() {
   const [portfolioData, setPortfolioData] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // --- ACTIONABLE UPGRADE LOGIC ---
+  const handleUpgrade = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevents any parent link interference
+    console.log("Redirecting to Stripe...");
+    window.location.href = "https://buy.stripe.com/5kQ3cw6zzea6gi62jM38401";
+  };
+
+  // --- FILE UPLOAD LOGIC ---
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -31,6 +39,7 @@ export default function AnalyzePage() {
     reader.readAsText(file);
   };
 
+  // --- AI MESSAGE LOGIC ---
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     const userMsg = input.trim();
@@ -53,11 +62,11 @@ export default function AnalyzePage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#050505] text-white selection:bg-yellow-400/30">
+    <div className="flex h-screen bg-[#050505] text-white selection:bg-yellow-400/30 font-sans overflow-hidden">
       {/* Sidebar - Command Center */}
-      <aside className="w-72 border-r border-white/5 bg-black p-6 hidden lg:flex flex-col gap-8">
-        <Link href="/" className="text-xl font-black tracking-tighter text-yellow-400">
-          WILSON <span className="text-white">CAPITAL</span>
+      <aside className="w-72 border-r border-white/5 bg-black p-6 hidden lg:flex flex-col gap-8 flex-shrink-0">
+        <Link href="/" className="text-xl font-black tracking-tighter text-yellow-400 italic">
+          WILSON <span className="text-white italic-none">CAPITAL</span>
         </Link>
 
         {/* Upload Section */}
@@ -67,7 +76,7 @@ export default function AnalyzePage() {
             onClick={() => fileRef.current?.click()}
             className={`w-full py-4 px-4 border border-dashed rounded-2xl text-xs transition-all flex flex-col items-center gap-2 ${
               portfolioData 
-              ? 'border-yellow-400/50 bg-yellow-400/5 text-yellow-400' 
+              ? 'border-yellow-400/50 bg-yellow-400/5 text-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.1)]' 
               : 'border-white/10 text-zinc-500 hover:border-yellow-400/40 hover:text-zinc-300'
             }`}
           >
@@ -78,14 +87,14 @@ export default function AnalyzePage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-4 overflow-y-auto">
           <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Quick Analysis</p>
           <div className="space-y-2">
             {['Analyze my portfolio', 'Assess biggest risks', 'Diversification score', 'Rebalancing strategy'].map((q, i) => (
               <button 
                 key={i} 
                 onClick={() => setInput(q)} 
-                className="w-full text-left text-xs text-zinc-400 hover:text-yellow-400 p-3 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-white/5"
+                className="w-full text-left text-[11px] text-zinc-400 hover:text-yellow-400 p-3 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-white/5 uppercase tracking-tighter"
               >
                 → {q}
               </button>
@@ -93,30 +102,34 @@ export default function AnalyzePage() {
           </div>
         </div>
 
-        {/* Pro Upsell */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-zinc-900 to-black border border-white/10">
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs font-bold text-yellow-400">Pro Tier</p>
-            <span className="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-zinc-400 uppercase">Locked</span>
+        {/* Actionable Pro Upsell - THE FIX IS HERE */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-zinc-900 to-black border border-white/10 relative overflow-hidden group z-50">
+          <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 transition-opacity">
+             <div className="h-1.5 w-1.5 bg-yellow-400 rounded-full animate-ping" />
           </div>
+          <p className="text-xs font-bold text-yellow-400 uppercase tracking-tighter mb-1">Pro Tier</p>
           <p className="text-[10px] text-zinc-500 mb-4 leading-relaxed">Access Macro Insights, Commodities, and REITs strategies.</p>
-          <button className="w-full py-2.5 bg-white text-black text-[10px] font-black rounded-lg hover:bg-zinc-200 transition uppercase tracking-tighter">Upgrade Strategy</button>
+          <button 
+            onClick={handleUpgrade}
+            className="w-full py-3 bg-white text-black text-[10px] font-black rounded-lg hover:bg-yellow-400 transition-all uppercase tracking-tighter cursor-pointer relative z-[60]"
+          >
+            Upgrade Strategy — €29
+          </button>
         </div>
       </aside>
 
       {/* Main Chat Interface */}
-      <main className="flex-1 flex flex-col bg-[#050505] relative">
-        {/* Top Header */}
+      <main className="flex-1 flex flex-col bg-[#050505] relative overflow-hidden">
         <header className="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-black/40 backdrop-blur-xl sticky top-0 z-10">
           <div className="flex items-center gap-3">
-            <div className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse" />
+            <div className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
             <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">AI Institutional Advisor v2.0</h2>
           </div>
           <Link href="/" className="text-[10px] font-bold text-zinc-500 hover:text-white uppercase tracking-widest transition">Exit Terminal</Link>
         </header>
 
         {/* Chat Messages */}
-        <section className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+        <section className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth">
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[75%] px-6 py-4 rounded-3xl text-sm leading-relaxed ${
@@ -128,7 +141,7 @@ export default function AnalyzePage() {
               </div>
             </div>
           ))}
-          {loading && (
+          {loading && input && (
             <div className="flex justify-start">
               <div className="bg-zinc-900/50 border border-white/5 px-6 py-4 rounded-3xl text-xs text-zinc-500 italic animate-pulse">
                 Consulting macro engine...
@@ -154,10 +167,6 @@ export default function AnalyzePage() {
             >
               Execute
             </button>
-          </div>
-          <div className="flex justify-center gap-6 mt-6">
-             <span className="text-[8px] text-zinc-700 uppercase tracking-widest font-bold text-center">Data latency: 14ms</span>
-             <span className="text-[8px] text-zinc-700 uppercase tracking-widest font-bold text-center">Neural Analysis: Active</span>
           </div>
         </footer>
       </main>
