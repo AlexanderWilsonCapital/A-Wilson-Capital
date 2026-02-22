@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
+import Link from 'next/link';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -8,7 +9,7 @@ interface Message {
 
 export default function AnalyzePage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Welcome to Wilson Capital. I'm your AI portfolio advisor. You can upload a CSV file of your holdings, or simply describe your portfolio to me and I'll provide a comprehensive analysis including risk assessment, diversification feedback, and strategic recommendations." }
+    { role: 'assistant', content: "Welcome to Wilson Capital. I'm your AI portfolio advisor. You can upload a CSV of your holdings, or simply describe your strategy to me for a full micro and macro analysis." }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function AnalyzePage() {
       setPortfolioData(text);
       setMessages(prev => [...prev, 
         { role: 'user', content: `I've uploaded my portfolio file: ${file.name}` },
-        { role: 'assistant', content: `Portfolio file "${file.name}" loaded successfully. I can see your holdings. Ask me anything about your portfolio, or say "analyze my portfolio" for a full breakdown.` }
+        { role: 'assistant', content: `Portfolio "${file.name}" loaded. I'm ready. Ask me to "analyze my portfolio" or ask about specific risk exposures.` }
       ]);
     };
     reader.readAsText(file);
@@ -46,87 +47,120 @@ export default function AnalyzePage() {
       const data = await res.json();
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'System error. Please verify your connection and try again.' }]);
     }
     setLoading(false);
   };
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col">
-      {/* Nav */}
-      <nav className="flex justify-between items-center px-8 py-4 border-b border-gray-800">
-        <a href="/" className="text-xl font-bold">Wilson <span className="text-yellow-400">Capital</span></a>
-        <span className="text-sm text-gray-400">AI Portfolio Advisor</span>
-      </nav>
+    <div className="flex h-screen bg-[#050505] text-white selection:bg-yellow-400/30">
+      {/* Sidebar - Command Center */}
+      <aside className="w-72 border-r border-white/5 bg-black p-6 hidden lg:flex flex-col gap-8">
+        <Link href="/" className="text-xl font-black tracking-tighter text-yellow-400">
+          WILSON <span className="text-white">CAPITAL</span>
+        </Link>
 
-      <div className="flex flex-1 max-w-5xl mx-auto w-full px-4 py-8 gap-6">
-        {/* Sidebar */}
-        <div className="w-64 shrink-0 space-y-4">
-          <div className="p-4 rounded-xl border border-gray-800">
-            <h3 className="font-semibold mb-3 text-sm text-gray-300 uppercase tracking-wider">Upload Portfolio</h3>
-            <p className="text-xs text-gray-500 mb-3">Upload a CSV with your holdings (ticker, shares, value)</p>
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="w-full py-2 border border-dashed border-gray-600 rounded-lg text-sm text-gray-400 hover:border-yellow-400 hover:text-yellow-400 transition"
-            >
-              {portfolioData ? '✓ Portfolio Loaded' : '+ Upload CSV'}
-            </button>
-            <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFile} />
-          </div>
+        {/* Upload Section */}
+        <div className="space-y-4">
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Data Ingestion</p>
+          <button
+            onClick={() => fileRef.current?.click()}
+            className={`w-full py-4 px-4 border border-dashed rounded-2xl text-xs transition-all flex flex-col items-center gap-2 ${
+              portfolioData 
+              ? 'border-yellow-400/50 bg-yellow-400/5 text-yellow-400' 
+              : 'border-white/10 text-zinc-500 hover:border-yellow-400/40 hover:text-zinc-300'
+            }`}
+          >
+            <span className="text-lg">{portfolioData ? '✓' : '+'}</span>
+            {portfolioData ? 'Portfolio Synced' : 'Upload CSV / Excel'}
+          </button>
+          <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFile} />
+        </div>
 
-          <div className="p-4 rounded-xl border border-gray-800">
-            <h3 className="font-semibold mb-3 text-sm text-gray-300 uppercase tracking-wider">Quick Analysis</h3>
-            <div className="space-y-2">
-              {['Analyze my portfolio', 'What are my biggest risks?', 'How diversified am I?', 'What should I rebalance?'].map((q, i) => (
-                <button key={i} onClick={() => setInput(q)} className="w-full text-left text-xs text-gray-400 hover:text-yellow-400 py-1 transition">
-                  → {q}
-                </button>
-              ))}
-            </div>
+        {/* Quick Actions */}
+        <div className="flex-1 space-y-4">
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Quick Analysis</p>
+          <div className="space-y-2">
+            {['Analyze my portfolio', 'Assess biggest risks', 'Diversification score', 'Rebalancing strategy'].map((q, i) => (
+              <button 
+                key={i} 
+                onClick={() => setInput(q)} 
+                className="w-full text-left text-xs text-zinc-400 hover:text-yellow-400 p-3 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-white/5"
+              >
+                → {q}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Chat */}
-        <div className="flex-1 flex flex-col rounded-xl border border-gray-800 overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0" style={{maxHeight: 'calc(100vh - 220px)'}}>
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                  m.role === 'user' 
-                    ? 'bg-yellow-400 text-black font-medium' 
-                    : 'bg-gray-900 text-gray-100 border border-gray-800'
-                }`}>
-                  {m.content}
-                </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-900 border border-gray-800 px-4 py-3 rounded-2xl text-sm text-gray-400">
-                  Analyzing...
-                </div>
-              </div>
-            )}
+        {/* Pro Upsell */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-zinc-900 to-black border border-white/10">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs font-bold text-yellow-400">Pro Tier</p>
+            <span className="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-zinc-400 uppercase">Locked</span>
           </div>
+          <p className="text-[10px] text-zinc-500 mb-4 leading-relaxed">Access Macro Insights, Commodities, and REITs strategies.</p>
+          <button className="w-full py-2.5 bg-white text-black text-[10px] font-black rounded-lg hover:bg-zinc-200 transition uppercase tracking-tighter">Upgrade Strategy</button>
+        </div>
+      </aside>
 
-          <div className="p-4 border-t border-gray-800 flex gap-3">
+      {/* Main Chat Interface */}
+      <main className="flex-1 flex flex-col bg-[#050505] relative">
+        {/* Top Header */}
+        <header className="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-black/40 backdrop-blur-xl sticky top-0 z-10">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse" />
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">AI Institutional Advisor v2.0</h2>
+          </div>
+          <Link href="/" className="text-[10px] font-bold text-zinc-500 hover:text-white uppercase tracking-widest transition">Exit Terminal</Link>
+        </header>
+
+        {/* Chat Messages */}
+        <section className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+          {messages.map((m, i) => (
+            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[75%] px-6 py-4 rounded-3xl text-sm leading-relaxed ${
+                m.role === 'user' 
+                ? 'bg-yellow-400 text-black font-semibold shadow-lg shadow-yellow-400/5' 
+                : 'bg-zinc-900/50 border border-white/5 text-zinc-200 backdrop-blur-sm'
+              }`}>
+                {m.content}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div className="flex justify-start">
+              <div className="bg-zinc-900/50 border border-white/5 px-6 py-4 rounded-3xl text-xs text-zinc-500 italic animate-pulse">
+                Consulting macro engine...
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Sticky Input Bar */}
+        <footer className="p-8 bg-gradient-to-t from-black via-black/80 to-transparent">
+          <div className="max-w-4xl mx-auto relative group">
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
-              placeholder="Ask about your portfolio..."
-              className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition"
+              placeholder="Query portfolio or ask about macro trends..."
+              className="w-full bg-zinc-900/80 border border-white/10 rounded-2xl px-6 py-5 pr-24 text-sm text-white focus:outline-none focus:border-yellow-400/50 transition-all shadow-2xl backdrop-blur-md"
             />
-            <button
+            <button 
               onClick={sendMessage}
               disabled={loading}
-              className="px-6 py-3 bg-yellow-400 text-black font-bold rounded-xl text-sm hover:bg-yellow-300 transition disabled:opacity-50"
+              className="absolute right-3 top-2.5 bottom-2.5 px-5 bg-yellow-400 text-black font-black rounded-xl text-[10px] uppercase tracking-tighter hover:bg-yellow-300 transition-all disabled:opacity-50 active:scale-95"
             >
-              Send
+              Execute
             </button>
           </div>
-        </div>
-      </div>
-    </main>
+          <div className="flex justify-center gap-6 mt-6">
+             <span className="text-[8px] text-zinc-700 uppercase tracking-widest font-bold text-center">Data latency: 14ms</span>
+             <span className="text-[8px] text-zinc-700 uppercase tracking-widest font-bold text-center">Neural Analysis: Active</span>
+          </div>
+        </footer>
+      </main>
+    </div>
   );
 }
