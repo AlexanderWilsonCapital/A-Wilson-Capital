@@ -18,11 +18,3 @@ export async function GET() {
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
-```
-
----
-
-Create all four files, save them, then restart your server:
-```
-taskkill /F /IM node.exe
-npm run dev
