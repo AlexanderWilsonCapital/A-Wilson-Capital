@@ -1,5 +1,6 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 interface Message {
@@ -7,14 +8,17 @@ interface Message {
   content: string;
 }
 
-export default function AnalyzePage() {
+// Separate component for content to handle searchParams safely
+function AnalyzeContent() {
+  const searchParams = useSearchParams();
+  const isPro = searchParams.get('session') === 'pro';
+  
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Welcome to Wilson Capital. I'm your AI portfolio advisor. Upload a CSV or describe your holdings for analysis." }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [portfolioData, setPortfolioData] = useState('');
-  const fileRef = useRef<HTMLInputElement>(null);
 
   const handleUpgrade = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -53,7 +57,6 @@ export default function AnalyzePage() {
             <button onClick={() => setInput('Analyze my portfolio')} className="w-full text-left text-xs text-zinc-400 hover:text-yellow-400 p-2 uppercase italic transition-colors">→ Analyze Portfolio</button>
           </div>
 
-          {/* NEW: CAPITAL MANAGEMENT SIDEBAR BUTTON */}
           <div className="space-y-4">
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Asset Management</p>
             <Link href="/manage" className="block w-full text-left text-[10px] font-bold text-white/60 hover:text-white p-3 rounded-xl bg-white/5 border border-white/10 hover:border-yellow-400/50 transition-all uppercase tracking-tighter">
@@ -63,16 +66,18 @@ export default function AnalyzePage() {
           </div>
         </div>
 
-        {/* PRO BUTTON */}
-        <div className="p-5 rounded-2xl bg-zinc-900 border border-white/10 relative z-50">
-          <p className="text-xs font-bold text-yellow-400 uppercase mb-2">Pro Tier</p>
-          <button 
-            onClick={handleUpgrade}
-            className="w-full py-3 bg-white text-black text-[10px] font-black rounded-lg hover:bg-yellow-400 transition-all uppercase cursor-pointer"
-          >
-            Upgrade Strategy — €29
-          </button>
-        </div>
+        {!isPro ? (
+          <div className="p-5 rounded-2xl bg-zinc-900 border border-white/10 relative z-50">
+            <p className="text-xs font-bold text-yellow-400 uppercase mb-2">Pro Tier</p>
+            <button onClick={handleUpgrade} className="w-full py-3 bg-white text-black text-[10px] font-black rounded-lg hover:bg-yellow-400 transition-all uppercase cursor-pointer">
+              Upgrade Strategy — €29
+            </button>
+          </div>
+        ) : (
+          <div className="p-5 rounded-2xl bg-yellow-400/5 border border-yellow-400/20">
+             <p className="text-[10px] font-black text-yellow-400 uppercase tracking-widest italic">✓ Pro Terminal Active</p>
+          </div>
+        )}
       </aside>
 
       {/* Main Terminal */}
@@ -89,7 +94,6 @@ export default function AnalyzePage() {
                 {m.content}
               </div>
               
-              {/* NEW: CONTEXTUAL MANAGEMENT LINK UNDER AI MESSAGES */}
               {m.role === 'assistant' && i !== 0 && (
                 <div className="mt-3 ml-2 flex items-center gap-3">
                   <Link href="/manage" className="text-[9px] font-bold text-yellow-400/80 hover:text-yellow-400 uppercase tracking-widest flex items-center gap-1 transition-colors">
@@ -113,8 +117,21 @@ export default function AnalyzePage() {
             />
             <button onClick={sendMessage} className="absolute right-2 top-2 bottom-2 px-6 bg-yellow-400 text-black font-black rounded-lg text-[10px] uppercase transition-transform active:scale-95">Execute</button>
           </div>
+          <div className="flex justify-center gap-6 mt-6">
+            <span className="text-[8px] text-zinc-700 uppercase tracking-widest font-bold">Data latency: 14ms</span>
+            <span className="text-[8px] text-zinc-700 uppercase tracking-widest font-bold">Neural Analysis: Active</span>
+          </div>
         </footer>
       </main>
     </div>
+  );
+}
+
+// Final Export with Suspense wrapper
+export default function AnalyzePage() {
+  return (
+    <Suspense fallback={<div className="h-screen bg-[#050505]" />}>
+      <AnalyzeContent />
+    </Suspense>
   );
 }
